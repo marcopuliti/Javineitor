@@ -10,27 +10,24 @@ def cambiar_grillado():
 
     try:
         GRID_SIZE = float(entrada_valor.get())
-        
-        # Limpiar el gráfico
-        ax.clear()
-
-        # Reconfigurar el gráfico con la nueva grilla
-        ax.set_xlim(0, 10)
-        ax.set_ylim(0, 10)
-        ax.set_title(f"Haz clic para añadir puntos (Grilla: {GRID_SIZE} unidades)")
-        ax.set_xlabel("Eje X")
-        ax.set_ylabel("Eje Y")
-        ax.grid(True, which='both', linestyle='--', linewidth=0.5)
-
-        # Actualizar las líneas de la grilla más marcadas
-        ax.set_xticks([GRID_SIZE*i for i in range(0, int(10/GRID_SIZE +1), 1)])
-        ax.set_yticks([GRID_SIZE*i for i in range(0, int(10/GRID_SIZE +1), 1)])
-
-        # Redibujar el canvas actualizado
-        canvas.draw()
-
     except ValueError:
-        print("Por favor, ingrese un valor numérico válido.")
+        GRID_SIZE = 1  # Valor por defecto si no se ingresa nada
+
+    # Reconfigurar el gráfico con la nueva grilla
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_title(f"Haz clic para añadir puntos (Grilla: {GRID_SIZE} unidades)")
+    ax.set_xlabel("Eje X")
+    ax.set_ylabel("Eje Y")
+    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+    # Actualizar las líneas de la grilla más marcadas
+    ax.set_xticks([GRID_SIZE*i for i in range(0, int(10/GRID_SIZE +1), 1)])
+    ax.set_yticks([GRID_SIZE*i for i in range(0, int(10/GRID_SIZE +1), 1)])
+
+    # Redibujar el canvas actualizado
+    canvas.draw()
+
 def guardar_archivo():
     
     # Abrir ventana para elegir ruta de guardado
@@ -97,19 +94,35 @@ def onclick(event):
         if Etapa == "vertices":
     
             if event.xdata is not None and event.ydata is not None:
+
                 # Ajustar a la grilla
                 x, y = snap_to_grid(event.xdata, event.ydata, GRID_SIZE)
-                puntos[(x, y)] = etiqueta
-                etiqueta += 1
-                # Dibujar punto
-                plt.scatter(x, y, color='black', s=50)
-#                plt.draw()
+
+                # Verificar si el punto ya existe
+                if (x, y) in puntos.keys():
+                    pass
+                else:
+                    etiqueta = len(puntos)
+                    puntos[(x, y)] = etiqueta
+                    # Dibujar punto
+                    plt.scatter(x, y, color='black', s=50)
     
         elif Etapa == "aristas":
         
             if event.xdata is not None and event.ydata is not None:
                 # Ajustar a la grilla
                 x, y = snap_to_grid(event.xdata, event.ydata, GRID_SIZE)
+
+                # Verificar si el punto ya existe
+                if (x, y) in puntos.keys():
+                    pass
+                else:
+                    etiqueta = len(puntos)
+                    puntos[(x, y)] = etiqueta
+                    # Dibujar punto
+                    plt.scatter(x, y, color='black', s=50)
+                    plt.draw()
+
                 if not Media_arista:
                     extremo1 = (x, y)
                     Media_arista = True
@@ -121,13 +134,23 @@ def onclick(event):
                 if len(aristas)>0:
                     for arista in aristas:
                         ax.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='blue', linestyle='-', linewidth=2, label='Línea entre puntos')
-#                plt.draw()
         
         elif Etapa == "matching":
             
             if event.xdata is not None and event.ydata is not None:
                 # Ajustar a la grilla
                 x, y = snap_to_grid(event.xdata, event.ydata, GRID_SIZE)
+
+                # Verificar si el punto ya existe
+                if (x, y) in puntos.keys():
+                    pass
+                else:
+                    etiqueta = len(puntos)
+                    puntos[(x, y)] = etiqueta
+                    # Dibujar punto
+                    plt.scatter(x, y, color='black', s=50)
+                    plt.draw()
+                
                 if not Media_arista:
                     extremo1 = (x, y)
                     Media_arista = True
@@ -140,6 +163,56 @@ def onclick(event):
                     for arista in matching:
                         ax.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='red', linestyle='-', linewidth=2, label='Línea entre puntos')
         plt.draw()
+    elif event.button == 3: # Click derecho
+        # Eliminar punto
+        if event.xdata is not None and event.ydata is not None:
+            # Ajustar a la grilla
+            x, y = snap_to_grid(event.xdata, event.ydata, GRID_SIZE)
+
+            # Verificar si el punto ya existe
+            if (x, y) in puntos.keys():
+                del puntos[(x, y)]
+                # Redibujar el gráfico
+                ax.clear()
+                cambiar_grillado()
+                for (x, y) in puntos.keys():
+                    plt.scatter(x, y, color='black', s=50)
+                plt.draw()
+
+def limpiar():
+    
+    global GRID_SIZE  # Actualizamos la variable global
+    global puntos
+    global aristas
+    global matching
+
+    # Limpiar el gráfico
+    ax.clear()
+    
+    # Limpiar los puntos y aristas
+    puntos = {}
+    aristas = []
+    matching = []
+
+    try:
+        GRID_SIZE = float(entrada_valor.get())
+    except:  # noqa: E722
+        GRID_SIZE = 1  # Valor por defecto si no se ingresa nada
+
+    # Reconfigurar el gráfico con la nueva grilla
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 10)
+    ax.set_title(f"Haz clic para añadir puntos (Grilla: {GRID_SIZE} unidades)")
+    ax.set_xlabel("Eje X")
+    ax.set_ylabel("Eje Y")
+    ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+
+    # Actualizar las líneas de la grilla más marcadas
+    ax.set_xticks([GRID_SIZE*i for i in range(0, int(10/GRID_SIZE +1), 1)])
+    ax.set_yticks([GRID_SIZE*i for i in range(0, int(10/GRID_SIZE +1), 1)])
+
+    # Redibujar el canvas actualizado
+    canvas.draw()
 
 # Crear la ventana principal
 root = tk.Tk()
@@ -178,16 +251,22 @@ btn_etiquetado.pack(pady=5)
 btn_guardar = tk.Button(frame_botones, text="Guardar codigo tikz", command=guardar_archivo)
 btn_guardar.pack(pady=10)
 
+# Botón de limpiar
+btn_limpiar = tk.Button(frame_botones, text="Borrar todo", command=limpiar)
+btn_limpiar.pack(pady=10)
+
+# Botón de salir
+btn_salir = tk.Button(frame_botones, text="Salir", command=root.quit)
+btn_salir.pack(pady=10)
 
 
 # Configuración de la grilla
 GRID_SIZE = 1  # Tamaño de la grilla (ej: 1.0 para coordenadas enteras, 0.5 para medias unidades)
 puntos = {}  # Diccionario para guardar coordenadas (x, y) como clave con su etiqueta
-aristas = [] # 
-etiqueta = 0
-Media_arista = False
-extremo1, extremo2 = (0,0), (0,0)
-matching = []
+aristas = [] # Lista para guardar aristas
+Media_arista = False # Variable para indicar el primer extremo de la arista
+extremo1, extremo2 = (0,0), (0,0) # Inicializar extremos de la arista
+matching = [] # Lista para guardar matching
         
         
 # Configuración del gráfico
