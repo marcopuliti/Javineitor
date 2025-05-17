@@ -7,17 +7,43 @@ Este proyecto es una aplicación de escritorio que permite visualizar datos de m
 
 # Requisitos
 - Python 3.8 o superior
-- Tkinter
 - Matplotlib
 
-# Instalación
+# 📦 Guía de Instalación
+
+## Requisitos previos
+
+- Python 3.x instalado
+- Git instalado (opcional, para clonar el repositorio)
+- pip (suele venir con Python)
+- (Opcional) Virtualenv o entorno virtual
+
+## 🚀 Instalación
+
+1. **Clonar el repositorio**
+
 ```bash
-pip install matplotlib
+git clone https://github.com/marcopuliti/Javineitor.git
+cd Javineitor
 ```
-# Uso
+2. **Crear un entorno virtual (opcional)**
+
 ```bash
+python -m venv venv
+source venv/bin/activate  # En Linux o Mac
+venv\Scripts\activate  # En Windows
+```
+3. **Instalar dependencias**
+
+```bash
+pip install -r requirements.txt
+```
+4. **Ejecutar la aplicación**
+
+```bash 
 python App.py
 ```
+
 # Contribución
 Si quieres contribuir al proyecto, por favor abre un issue o un pull request.
 # Contacto
