@@ -46,7 +46,7 @@ def guardar_archivo():
             # Vertices
             if etiquetado_var.get():
                 for (x, y) in puntos.keys():
-                    f.write(f"    \\node[draw,circle] ({puntos[(x,y)]}) at ({x},{y}) {{\(v_{{ {puntos[(x,y)]} }}\)}};\n")  # Formato: x,y en cada línea
+                    f.write(f"    \\node[draw,circle] ({puntos[(x,y)]}) at ({x},{y}) {{\\(v_{{ {puntos[(x,y)]} }}\\)}};\n")  # Formato: x,y en cada línea
             else:
                 for (x, y) in puntos.keys():
                     f.write(f"    \\node[draw,circle,fill] ({puntos[(x,y)]}) at ({x},{y}) {{ }};\n")  # Formato: x,y en cada línea
@@ -69,7 +69,7 @@ def guardar_archivo():
                 string = string[:-1]+"} {\n        \\path[decorate, decoration={snake,amplitude=2mm, segment length=4mm},draw=red] (\\from) -- (\\to);}\n"
                 f.write(string)
         
-            f.write("\end{tikzpicture}")
+            f.write("\\end{tikzpicture}")
         
         print(f"Archivo guardado en: {archivo_path}")
     else:
@@ -80,13 +80,7 @@ def snap_to_grid(x, y, grid_size):
     y_snapped = round(y / grid_size) * grid_size
     return x_snapped, y_snapped
 def onclick(event):
-    global Media_arista
-    global aristas
-    global extremo1
-    global extremo2
-    global etiqueta
-    global matching
-    global combo_opciones
+    global Media_arista, extremo1, extremo2, aristas, matching, combo_opciones
     
     Etapa = combo_opciones.get()
            
@@ -172,19 +166,28 @@ def onclick(event):
             # Verificar si el punto ya existe
             if (x, y) in puntos.keys():
                 del puntos[(x, y)]
+                # Eliminar aristas asociadas
+                aristas = [arista for arista in aristas if arista[0] != (x, y) and arista[1] != (x, y)]
+                matching = [arista for arista in matching if arista[0] != (x, y) and arista[1] != (x, y)]
+
                 # Redibujar el gráfico
                 ax.clear()
                 cambiar_grillado()
-                for (x, y) in puntos.keys():
+                for (x, y) in puntos.keys(): 
                     plt.scatter(x, y, color='black', s=50)
+                # Redibujar aristas
+                if len(aristas)>0:
+                    for arista in aristas:
+                        ax.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='blue', linestyle='-', linewidth=2, label='Línea entre puntos')
+                # Redibujar matching
+                if len(matching)>0:
+                    for arista in matching:
+                        ax.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='red', linestyle='-', linewidth=2, label='Línea entre puntos')
                 plt.draw()
 
 def limpiar():
     
-    global GRID_SIZE  # Actualizamos la variable global
-    global puntos
-    global aristas
-    global matching
+    global GRID_SIZE, puntos, aristas, matching
 
     # Limpiar el gráfico
     ax.clear()
