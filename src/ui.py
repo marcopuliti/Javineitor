@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+import sys
 
 from .logica import (
     cambiar_grillado,
@@ -73,7 +74,7 @@ def construir_interfaz(ventana, estado):
     canvas.get_tk_widget().pack(side="left", fill="both", expand=True)
 
     # Conectar evento de click
-    fig.canvas.mpl_connect('button_press_event', lambda event: onclick(event, estado, accion))
+    fig.canvas.mpl_connect('button_press_event', lambda event: onclick(event, estado, accion, ax, canvas))
 
 
 # Función para crear la ventana principal
@@ -84,5 +85,8 @@ def crear_ventana(estado):
 
     # Crear la interfaz gráfica
     construir_interfaz(ventana, estado)
+
+    # Asegura que al cerrar la ventana se termine el programa completamente
+    ventana.protocol("WM_DELETE_WINDOW", lambda: (ventana.destroy(), sys.exit()))
 
     return ventana

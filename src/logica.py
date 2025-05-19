@@ -13,7 +13,10 @@ class EstadoGraficador:
         self.extremo2 = None
 
 def cambiar_grillado(estado, ancho_grilla, canvas, ax):
-    estado.grid_size = float(ancho_grilla.get())
+    try:
+        estado.grid_size = float(ancho_grilla.get())
+    except:  # noqa: E722
+        estado.grid_size = 1
     ax.set_title(f"Haz clic para añadir puntos (Grilla: {estado.grid_size} unidades)")
     ax.set_xticks([estado.grid_size*i for i in range(0, int(10/estado.grid_size +1), 1)])
     ax.set_yticks([estado.grid_size*i for i in range(0, int(10/estado.grid_size +1), 1)])
@@ -103,7 +106,7 @@ def snap_to_grid(x, y, grid_size):
     y = round(y / grid_size) * grid_size
     return x, y
 
-def onclick(event, estado, accion):
+def onclick(event, estado, accion, ax, canvas):
     Etapa = accion.get()
     if event.button == 1: # Click izquierdo
         if Etapa == "vertices":
@@ -117,7 +120,7 @@ def onclick(event, estado, accion):
                     etiqueta = len(estado.puntos)
                     estado.puntos[(x, y)] = etiqueta
                     # Dibujar punto
-                    plt.scatter(x, y, color='black', s=50)
+                    ax.scatter(x, y, color='black', s=50)
         elif Etapa == "aristas":
             if event.xdata is not None and event.ydata is not None:
                 # Ajustar a la grilla
@@ -168,3 +171,40 @@ def onclick(event, estado, accion):
                     for arista in estado.matching:
                         plt.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='red', linestyle='-', linewidth=2, label='Línea entre puntos')
         plt.draw()
+    elif event.button == 3: # Click derecho
+        # Eliminar punto
+        if event.xdata is not None and event.ydata is not None:
+            # Ajustar a la grilla
+            x, y = snap_to_grid(event.xdata, event.ydata, estado.grid_size)
+
+            # Verificar si el punto ya existe
+            if (x, y) in estado.puntos.keys():
+                # Eliminar el punto
+                del estado.puntos[(x, y)]
+                # Reetiquetar los puntos restantes
+                for i, (punto, etiqueta) in enumerate(estado.puntos.items()):
+                    estado.puntos[punto] = i
+                # Eliminar aristas asociadas
+                estado.aristas = [arista for arista in estado.aristas if arista[0] != (x, y) and arista[1] != (x, y)]
+                estado.matching = [arista for arista in estado.matching if arista[0] != (x, y) and arista[1] != (x, y)]
+
+                # Redibujar el gráfico
+                ax.cla()  # Limpiar el gráfico actual
+                ax.set_xlim(0, 10)
+                ax.set_ylim(0, 10)
+                ax.set_title(f"Haz clic para añadir puntos (Grilla: {1} unidades)")
+                ax.grid(True, which='both', linestyle='--', linewidth=0.5)  # Grilla visible
+                # Líneas de la grilla más marcadas
+                ax.set_xticks([estado.grid_size*i for i in range(0, int(10/estado.grid_size +1), 1)])
+                ax.set_yticks([estado.grid_size*i for i in range(0, int(10/estado.grid_size +1), 1)])
+                for (x, y) in estado.puntos.keys():
+                    ax.scatter(x, y, color='black', s=50)
+                # Redibujar aristas
+                if len(estado.aristas) > 0:
+                    for arista in estado.aristas:
+                        ax.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='blue', linestyle='-', linewidth=2, label='Línea entre puntos')
+                # Redibujar matching
+                if len(estado.matching) > 0:
+                    for arista in estado.matching:
+                        ax.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='red', linestyle='-', linewidth=2, label='Línea entre puntos')
+                canvas.draw()

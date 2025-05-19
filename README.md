@@ -28,11 +28,17 @@ Este proyecto es una aplicación de escritorio que permite visualizar datos de m
    source venv/bin/activate
    ```
 
-2. **Instalar el proyecto en modo editable**
+2. **Instalar las dependencias**
 
    Ubica la terminal en la carpeta raíz del proyecto y ejecuta:
    ```bash
-   pip install -e .
+   pip install -r requirements.txt
+   ```
+3. **Instalar el proyecto**
+
+   Desde la carpeta raíz del proyecto, ejecuta:
+   ```bash
+   pip install .
    ```
 
 ## ▶️ Uso
