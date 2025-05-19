@@ -4,44 +4,43 @@ Este proyecto es una aplicación de escritorio que permite visualizar datos de m
 - Interfaz gráfica intuitiva
 - Exportación de gráficos a código LaTeX
 
-
-# Requisitos
-- Python 3.8 o superior
-- Matplotlib
-
 # 📦 Guía de Instalación
 
 ## Requisitos previos
 
 - Python 3.x instalado
-- Git instalado (opcional, para clonar el repositorio)
 - pip (suele venir con Python)
-- (Opcional) Virtualenv o entorno virtual
+- (Opcional) Virtualenv o entorno virtual para aislar dependencias
 
 ## 🚀 Instalación
 
-1. **Clonar el repositorio**
+1. **Crear un entorno virtual (opcional pero recomendado)**
+
+   En Windows:
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate
+   ```
+
+   En Linux o Mac:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   ```
+
+2. **Instalar el proyecto en modo editable**
+
+   Ubica la terminal en la carpeta raíz del proyecto y ejecuta:
+   ```bash
+   pip install -e .
+   ```
+
+## ▶️ Uso
+
+Cada vez que quieras ejecutar la aplicación, asegúrate de que el entorno virtual esté activado y ejecuta:
 
 ```bash
-git clone https://github.com/marcopuliti/Javineitor.git
-cd Javineitor
-```
-2. **Crear un entorno virtual (opcional)**
-
-```bash
-python -m venv venv
-source venv/bin/activate  # En Linux o Mac
-venv\Scripts\activate  # En Windows
-```
-3. **Instalar dependencias**
-
-```bash
-pip install -r requirements.txt
-```
-4. **Ejecutar la aplicación**
-
-```bash 
-python App.py
+python -m src.main
 ```
 
 # Contribución
