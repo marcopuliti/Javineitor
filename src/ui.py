@@ -61,6 +61,10 @@ def construir_interfaz(ventana, estado):
     btn_guardar = tk.Button(frame_botones, text="Guardar codigo tikz", command=lambda: guardar_archivo(etiquetado, estado))
     btn_guardar.pack(pady=10)
 
+    # Boton para generar diccionario de adyacencias
+    btn_diccionario = tk.Button(frame_botones, text="Copiar diccionario", command=lambda: estado.copiar_diccionario(ventana))
+    btn_diccionario.pack(pady=10)
+
     # Botón de limpiar
     btn_limpiar = tk.Button(frame_botones, text="Borrar todo", command=lambda: limpiar(estado, ax, canvas, ancho_grilla))
     btn_limpiar.pack(pady=10)

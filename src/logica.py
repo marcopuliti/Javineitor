@@ -11,6 +11,20 @@ class EstadoGraficador:
         self.media_arista = False
         self.extremo1 = None
         self.extremo2 = None
+    
+    def __str__(self):
+        return f"EstadoGraficador(grid_size={self.grid_size}, puntos={self.puntos}, aristas={self.aristas}, matching={self.matching})"
+    def __repr__(self):
+        return f"EstadoGraficador(grid_size={self.grid_size}, puntos={self.puntos}, aristas={self.aristas}, matching={self.matching})"
+    def copiar_diccionario(self, ventana):
+        """
+        Genera un diccionario de adyacencias a partir del estado actual.
+        """
+        diccionario = {self.puntos[(x, y)]: [] for (x, y) in self.puntos.keys()}
+        for (x1, y1), (x2, y2) in self.aristas:
+            diccionario[self.puntos[(x1, y1)]].append(self.puntos[(x2, y2)])
+        ventana.clipboard_clear()
+        ventana.clipboard_append(str(diccionario))
 
 def cambiar_grillado(estado, ancho_grilla, canvas, ax):
     try:
@@ -97,7 +111,6 @@ def limpiar(estado, ax, canvas, ancho_grilla):
     # Redibujar el canvas actualizado
     canvas.draw()
 
-
 def snap_to_grid(x, y, grid_size):
     """
     Ajusta las coordenadas (x, y) a la grilla más cercana.
@@ -107,87 +120,65 @@ def snap_to_grid(x, y, grid_size):
     return x, y
 
 def onclick(event, estado, accion, ax, canvas):
-    Etapa = accion.get()
-    if event.button == 1: # Click izquierdo
-        if Etapa == "vertices":
-            if event.xdata is not None and event.ydata is not None:
-                # Ajustar a la grilla
-                x, y = snap_to_grid(event.xdata, event.ydata, estado.grid_size)
-                # Verificar si el punto ya existe
-                if (x, y) in estado.puntos.keys():
+    Etapa = accion.get() # Obtener el valor del desplegable
+    if event.xdata is not None and event.ydata is not None: # Verificar que el clic fue dentro de los límites
+        x, y = snap_to_grid(event.xdata, event.ydata, estado.grid_size) # Ajustar a la grilla
+        if event.button == 1: # Click izquierdo
+            if Etapa == "vertices":
+                if (x, y) in estado.puntos.keys(): # Verificar si el punto ya existe
+                     pass
+                else:
+                    etiqueta = len(estado.puntos)
+                    estado.puntos[(x, y)] = etiqueta 
+                    ax.scatter(x, y, color='black', s=50) # Dibujar punto
+            elif Etapa == "aristas":
+                if (x, y) in estado.puntos.keys(): # Verificar si el punto ya existe
                     pass
                 else:
                     etiqueta = len(estado.puntos)
                     estado.puntos[(x, y)] = etiqueta
-                    # Dibujar punto
-                    ax.scatter(x, y, color='black', s=50)
-        elif Etapa == "aristas":
-            if event.xdata is not None and event.ydata is not None:
-                # Ajustar a la grilla
-                x, y = snap_to_grid(event.xdata, event.ydata, estado.grid_size)
-                # Verificar si el punto ya existe
-                if (x, y) in estado.puntos.keys():
-                    pass
-                else:
-                    etiqueta = len(estado.puntos)
-                    estado.puntos[(x, y)] = etiqueta
-                    # Dibujar punto
-                    plt.scatter(x, y, color='black', s=50)
+                    plt.scatter(x, y, color='black', s=50) # Dibujar punto
                 if not estado.media_arista:
                     estado.extremo1 = (x, y)
                     estado.media_arista = True
                 else:
                     estado.extremo2 = (x,y)
-                    estado.aristas.append((estado.extremo1,estado.extremo2))
+                    if (estado.extremo1,estado.extremo2) in estado.aristas or (estado.extremo2,estado.extremo1) in estado.aristas:
+                        pass
+                    else:
+                        estado.aristas.append((estado.extremo1,estado.extremo2))
                     estado.media_arista = False
-                # Dibujar linea
-                if len(estado.aristas)>0:
-                    for arista in estado.aristas:
-                        plt.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='blue', linestyle='-', linewidth=2, label='Línea entre puntos')
-        elif Etapa == "matching":
-            if event.xdata is not None and event.ydata is not None:
-                # Ajustar a la grilla
-                x, y = snap_to_grid(event.xdata, event.ydata, estado.grid_size)
-
-                # Verificar si el punto ya existe
-                if (x, y) in estado.puntos.keys():
+                for arista in estado.aristas: # Dibujar aristas
+                    plt.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='blue', linestyle='-', linewidth=2, label='Línea entre puntos')
+            elif Etapa == "matching":
+                if (x, y) in estado.puntos.keys(): # Verificar si el punto ya existe
                     pass
                 else:
                     etiqueta = len(estado.puntos)
                     estado.puntos[(x, y)] = etiqueta
-                    # Dibujar punto
-                    plt.scatter(x, y, color='black', s=50)
-                    plt.draw()
-
+                    plt.scatter(x, y, color='black', s=50) # Dibujar punto
                 if not estado.media_arista:
                     estado.extremo1 = (x, y)
                     estado.media_arista = True
                 else:
                     estado.extremo2 = (x,y)
-                    estado.matching.append((estado.extremo1,estado.extremo2))
+                    if (estado.extremo1,estado.extremo2) in estado.matching or (estado.extremo2,estado.extremo1) in estado.matching:
+                        pass
+                    else:
+                        estado.matching.append((estado.extremo1,estado.extremo2))
                     estado.media_arista = False
-                # Dibujar linea
-                if len(estado.matching)>0:
-                    for arista in estado.matching:
-                        plt.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='red', linestyle='-', linewidth=2, label='Línea entre puntos')
-        plt.draw()
-    elif event.button == 3: # Click derecho
-        # Eliminar punto
-        if event.xdata is not None and event.ydata is not None:
-            # Ajustar a la grilla
-            x, y = snap_to_grid(event.xdata, event.ydata, estado.grid_size)
-
-            # Verificar si el punto ya existe
-            if (x, y) in estado.puntos.keys():
-                # Eliminar el punto
+                for arista in estado.matching:
+                    plt.plot([arista[0][0], arista[1][0]], [arista[0][1], arista[1][1]], color='red', linestyle='-', linewidth=2, label='Línea entre puntos')
+            plt.draw()
+        elif event.button == 3: # Click derecho
+            # Eliminar punto
+            if (x, y) in estado.puntos.keys(): # Verificar si el punto ya existe
                 del estado.puntos[(x, y)]
-                # Reetiquetar los puntos restantes
-                for i, (punto, etiqueta) in enumerate(estado.puntos.items()):
+                for i, (punto, etiqueta) in enumerate(estado.puntos.items()): # Reetiquetar los puntos restantes
                     estado.puntos[punto] = i
                 # Eliminar aristas asociadas
                 estado.aristas = [arista for arista in estado.aristas if arista[0] != (x, y) and arista[1] != (x, y)]
                 estado.matching = [arista for arista in estado.matching if arista[0] != (x, y) and arista[1] != (x, y)]
-
                 # Redibujar el gráfico
                 ax.cla()  # Limpiar el gráfico actual
                 ax.set_xlim(0, 10)
