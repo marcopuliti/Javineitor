@@ -1,5 +1,5 @@
-from logica import EstadoGraficador
-from .ui import crear_ventana
+from javineitor.logica import EstadoGraficador
+from javineitor.ui import crear_ventana
 
 def main():
 

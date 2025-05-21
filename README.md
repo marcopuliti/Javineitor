@@ -38,7 +38,7 @@ Este proyecto es una aplicación de escritorio que permite visualizar datos de m
 
    Desde la carpeta raíz del proyecto, ejecuta:
    ```bash
-   pip install .
+   pip install -e .
    ```
 
 ## ▶️ Uso
