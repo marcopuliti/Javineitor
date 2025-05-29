@@ -46,7 +46,7 @@ Este proyecto es una aplicación de escritorio que permite visualizar datos de m
 Cada vez que quieras ejecutar la aplicación, asegúrate de que el entorno virtual esté activado y ejecuta:
 
 ```bash
-python -m src.main
+python -m javineitor.main
 ```
 
 # Contribución
